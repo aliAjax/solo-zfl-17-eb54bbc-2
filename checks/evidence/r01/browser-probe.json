@@ -1,0 +1,25 @@
+{
+  "status": 200,
+  "initial": {
+    "title": "放映编排台 · 胶片分镜版本控制",
+    "h1": "放映编排台",
+    "reelTreeChildren": 0,
+    "sideBodyChildren": 0,
+    "segmentCards": 0,
+    "hasUserSelectOptions": 0,
+    "statDuration": "0:00",
+    "totalDurationLegacy": null,
+    "warningListExists": false
+  },
+  "submitResult": {
+    "segmentCards": 0,
+    "reelTreeChildren": 0,
+    "toastText": "",
+    "storedKeys": []
+  },
+  "consoleErrors": [],
+  "pageErrors": [
+    "TypeError: Cannot read properties of null (reading 'addEventListener')\n    at http://127.0.0.1:8742/app.js:225:15",
+    "TypeError: Cannot read properties of null (reading 'addEventListener')\n    at http://127.0.0.1:8742/app.js:225:15"
+  ]
+}

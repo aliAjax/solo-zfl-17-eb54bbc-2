@@ -3,70 +3,57 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>胶片分镜条核对台</title>
+    <title>放映编排台 · 胶片分镜版本控制</title>
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
     <main class="shell">
       <header class="hero">
-        <div>
-          <p class="eyebrow">纸质放映胶片整理</p>
-          <h1>胶片分镜条核对台</h1>
+        <div class="hero-title">
+          <p class="eyebrow">纸质放映胶片 · 版本化编排</p>
+          <h1>放映编排台</h1>
+          <label class="user-switch">
+            当前操作者
+            <select id="userSelect"></select>
+          </label>
         </div>
         <div class="hero-stats">
           <div>
-            <span>总时长</span>
-            <strong id="totalDuration">0:00</strong>
+            <span id="statDurationLabel">总时长（草稿）</span>
+            <strong id="statDuration">0:00</strong>
           </div>
           <div>
-            <span>破损片段</span>
-            <strong id="damageCount">0</strong>
+            <span>风险</span>
+            <strong id="statRisk">低 · 0</strong>
           </div>
           <div>
             <span>片段数</span>
-            <strong id="segmentCount">0</strong>
+            <strong id="statCount">0</strong>
+          </div>
+          <div>
+            <span>待提交变更</span>
+            <strong id="statStaged">0</strong>
           </div>
         </div>
       </header>
 
-      <section class="toolbar">
-        <label>
-          胶片卷
-          <input id="reelTitle" type="text" placeholder="例：春日试映A卷" />
-        </label>
-        <label>
-          颜色偏移
-          <select id="colorFilter">
-            <option value="all">全部</option>
-            <option value="正常">正常</option>
-            <option value="偏红">偏红</option>
-            <option value="偏青">偏青</option>
-            <option value="偏黄">偏黄</option>
-            <option value="褪色">褪色</option>
-          </select>
-        </label>
-        <label>
-          搜索
-          <input id="searchInput" type="search" placeholder="片段编号或备注" />
-        </label>
-        <button id="exportBtn">导出清单</button>
-      </section>
-
       <section class="layout">
-        <aside class="panel">
-          <h2>录入片段</h2>
-          <form id="segmentForm" class="segment-form">
-            <label>
-              片段编号
-              <input id="codeInput" required placeholder="A-014" />
-            </label>
-            <label>
-              时长秒数
-              <input id="durationInput" required type="number" min="1" value="12" />
-            </label>
+        <aside class="panel reels-panel">
+          <div class="panel-head">
+            <h2>胶片卷</h2>
+            <button id="newReelBtn" type="button">＋ 新卷</button>
+          </div>
+          <div id="reelTree" class="reel-tree"></div>
+        </aside>
+
+        <section class="panel work-panel">
+          <div id="branchBar" class="branch-bar"></div>
+          <div id="viewBanner"></div>
+          <div class="toolbar">
             <label>
               颜色偏移
-              <select id="shiftInput">
+              <select id="colorFilter">
+                <option value="all">全部</option>
                 <option value="正常">正常</option>
                 <option value="偏红">偏红</option>
                 <option value="偏青">偏青</option>
@@ -75,41 +62,74 @@
               </select>
             </label>
             <label>
-              破损情况
-              <select id="damageInput">
-                <option value="完好">完好</option>
-                <option value="轻微划痕">轻微划痕</option>
-                <option value="齿孔破损">齿孔破损</option>
-                <option value="接片松动">接片松动</option>
-                <option value="需跳过">需跳过</option>
-              </select>
+              搜索
+              <input id="searchInput" type="search" placeholder="片段编号或备注" />
             </label>
-            <label>
-              缩略图
-              <input id="thumbInput" type="file" accept="image/*" />
-            </label>
-            <label>
-              备注
-              <textarea id="noteInput" rows="4" placeholder="试映前要留意的画面、接片或声音点"></textarea>
-            </label>
-            <button class="primary" type="submit">加入放映清单</button>
-          </form>
-        </aside>
-
-        <section class="panel list-panel">
-          <div class="panel-head">
-            <h2>放映顺序</h2>
-            <span>拖拽片段调整顺序</span>
+            <button id="exportBtn" type="button">导出清单</button>
           </div>
           <div id="segmentList" class="segment-list"></div>
+          <form id="segmentForm" class="segment-form">
+            <h3 id="formTitle">录入片段（进入待提交）</h3>
+            <div class="form-grid">
+              <label>
+                片段编号
+                <input id="codeInput" required maxlength="24" placeholder="A-014" />
+              </label>
+              <label>
+                时长秒数
+                <input id="durationInput" required type="number" min="1" max="3600" step="1" value="12" />
+              </label>
+              <label>
+                颜色偏移
+                <select id="shiftInput">
+                  <option value="正常">正常</option>
+                  <option value="偏红">偏红</option>
+                  <option value="偏青">偏青</option>
+                  <option value="偏黄">偏黄</option>
+                  <option value="褪色">褪色</option>
+                </select>
+              </label>
+              <label>
+                破损情况
+                <select id="damageInput">
+                  <option value="完好">完好</option>
+                  <option value="轻微划痕">轻微划痕</option>
+                  <option value="齿孔破损">齿孔破损</option>
+                  <option value="接片松动">接片松动</option>
+                  <option value="需跳过">需跳过</option>
+                </select>
+              </label>
+              <label>
+                缩略图（≤300KB，可选）
+                <input id="thumbInput" type="file" accept="image/*" />
+              </label>
+              <label class="form-note">
+                备注
+                <textarea id="noteInput" rows="2" maxlength="200" placeholder="试映前要留意的画面、接片或声音点"></textarea>
+              </label>
+            </div>
+            <div class="form-actions">
+              <button class="primary" id="formSubmitBtn" type="submit">加入待提交变更</button>
+              <button id="formCancelBtn" type="button" hidden>取消编辑</button>
+            </div>
+          </form>
         </section>
 
-        <aside class="panel warning-panel">
-          <h2>试映前核对</h2>
-          <div id="warningList" class="warning-list"></div>
+        <aside class="panel side-panel">
+          <nav class="tabs" id="sideTabs">
+            <button type="button" data-tab="staged">待提交 <b class="badge" id="stagedBadge" hidden></b></button>
+            <button type="button" data-tab="review">审核 <b class="badge alert" id="reviewBadge" hidden></b></button>
+            <button type="button" data-tab="versions">版本</button>
+            <button type="button" data-tab="audit">日志</button>
+            <button type="button" data-tab="check">核对</button>
+          </nav>
+          <div id="sideBody" class="side-body"></div>
         </aside>
       </section>
     </main>
+
+    <div id="modalRoot"></div>
+    <div id="toastRoot" class="toast-root"></div>
 
     <script src="app.js"></script>
   </body>
